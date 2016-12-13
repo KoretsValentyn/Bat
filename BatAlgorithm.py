@@ -96,7 +96,8 @@ class BatAlgorithm():
                 if (Flocal <= self.Fitness[i]) and (rnd < self.A[i]):
                     for j in range(self.Dim):
                     	self.Sol[i][j] = S[i][j]
-                    self.Fitness[i] = Flocal                    self.A[i] = self.A[i]*self.Alpha
+                    self.Fitness[i] = Flocal        
+                    self.A[i] = self.A[i]*self.Alpha
                     self.r[i] = self.PulseRate*(1-exp(-self.Gama*(t)))
 
                 if Flocal <= self.f_min:

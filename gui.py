@@ -2,6 +2,7 @@ import random
 from BatAlgorithm import *
 import numpy as np
 from tkinter import*
+from tkinter import messagebox
 
 class Gui( Frame ):
    def __init__( self ):
@@ -43,6 +44,7 @@ class Gui( Frame ):
       self.PulseRateF = Entry(self,textvariable=self.PulseRateVar)
 
       self.start = Button(self,text=" Start  ",command=self.move)
+
       self.start.grid(row = 9, column =1, sticky = W+E+N+S)
 
       self.DimentionF.grid(row = 0, column = 1,sticky = W+E+N+S )
@@ -90,12 +92,38 @@ class Gui( Frame ):
       self.columnconfigure(1,weight = 1)
     
    def move(self):
-    Algorithm = BatAlgorithm(self.DimentionVar.get(), self.PopulationVar.get(), self.IteretionVar.get(),float(self.MinFrequencyVar.get()), float(self.MaxFrequencyVar.get()),float(self.AlphaVar.get()),float(self.GamaVar.get()),float(self.LoudnessVar.get()),float(self.PulseRateVar.get()),self.Rosenbrock)
-    Algorithm.move_bat()
+      if(self.ValidationFields()):
+         Algorithm = BatAlgorithm(self.DimentionVar.get(), self.PopulationVar.get(), self.IteretionVar.get(),float(self.MinFrequencyVar.get()), float(self.MaxFrequencyVar.get()),float(self.AlphaVar.get()),float(self.GamaVar.get()),float(self.LoudnessVar.get()),float(self.PulseRateVar.get()),self.Rosenbrock)
+         Algorithm.move_bat()
+      else:
+         messagebox.showinfo("Exception", "Введіть, будь ласка, всі поля")
+
 
    def Rosenbrock(self,Dim, sol):
    	npSol = np.array(sol)
    	return sum(100*(npSol[1:] - npSol[:-1]**2)**2 + (1 - npSol[:-1])**2)
+
+   def ValidationFields(self):
+      if(len(str(self.DimentionVar.get())) == 0):
+         return False
+      elif (len(str(self.PopulationVar.get())) == 0):
+         return False
+      elif (len(self.MinFrequencyVar.get()) == 0):
+         return False
+      elif (len(self.MaxFrequencyVar.get()) == 0):
+         return False
+      elif (len(str(self.IteretionVar.get())) == 0):
+         return False
+      elif (len(self.AlphaVar.get()) == 0):
+         return False
+      elif (len(self.GamaVar.get()) == 0):
+         return False
+      elif (len(self.LoudnessVar.get()) == 0):
+         return False
+      elif (len(self.PulseRateVar.get()) == 0):
+         return False
+      else: return True
+
 
 def main():
    Gui().mainloop()   
