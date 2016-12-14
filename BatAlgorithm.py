@@ -27,7 +27,7 @@ class BatAlgorithm():
         self.v = [[0 for i in range(self.Dim)] for j in range(self.NP)]  #Швидкість кажанів
         self.Sol = [[0 for i in range(self.Dim)] for j in range(self.NP)]  #Положення кажанів (координати)
         self.Fitness = [0] * self.NP  # Здоровя
-        self.average_health_history = [0]*self.N_Gen
+        self.average_health_history = []   #Середнє здоров'я популяцій
         self.best = [0] * self.Dim  #Кращі кажанів (координати)
         self.Fun = function
         
@@ -56,7 +56,6 @@ class BatAlgorithm():
                 rnd = random.uniform(0, 1)
                 self.v[i][j] = 0.0
                 self.Sol[i][j] = self.Lb[j] + (self.Ub[j] - self.Lb[j]) * rnd #Випадковим чином генеруємо координати початкох кажанів
-
             self.Fitness[i] = self.Fun(self.Dim, self.Sol[i])
         self.best_bat()
 
@@ -104,11 +103,11 @@ class BatAlgorithm():
                     for j in range(self.Dim):
                         self.best[j] = S[i][j]
                     self.f_min = Flocal
-            self.average_health_history =[np.average(self.Fitness)]+self.average_health_history
-            if(self.stop(t)):
+            self.average_health_history.append(np.average(self.Fitness))
+            if self.stop(t):
                 print("break!")
+                print(t)
                 break
-                
 
         print(self.f_min) 
         print(self.best)
@@ -116,7 +115,7 @@ class BatAlgorithm():
     def stop(self, t):
         if t>=4:
             resent_hist = self.average_health_history[t-4:t+1]
-            if max(resent_hist) - min(resent_hist) < 0.01 and abs(self.f_min - np.average(self.Fitness))<0.01:
+            if max(resent_hist) - min(resent_hist) < 0.0001 and abs(self.f_min - np.average(self.Fitness))<0.01:
                 return True
             else:
                 return False
