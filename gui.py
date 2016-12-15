@@ -16,12 +16,14 @@ class Gui( Frame ):
       self.DimentionLb = Label(self, text="Dimention: ")
       self.PopulationLb = Label(self, text="Population: ")
       self.MinFrequencyLb = Label(self, text="Min Frequency: ")
-      self.MaxFrequencyLb = Label(self, text="MaxFrequency: ")
+      self.MaxFrequencyLb = Label(self, text="Max Frequency: ")
       self.IteretionLb = Label(self, text = "Iteration: ")
       self.AlphaLb = Label(self, text = "Alpha: ")
       self.GamaLb = Label(self, text = "Gamma: ")
       self.LoudnessLb = Label(self, text = "Loudness: ")
       self.PulseRateLb = Label(self, text = "PulseRate: ")
+      self.IterationForWritingLb = Label(self,text = "Writing: ")
+
 
       self.DimentionVar = IntVar()
       self.PopulationVar = IntVar()
@@ -32,6 +34,8 @@ class Gui( Frame ):
       self.GamaVar = StringVar()
       self.LoudnessVar = StringVar()
       self.PulseRateVar = StringVar()
+      self.IterationForWritingVar = IntVar()
+
 
       self.DimentionF = Entry(self,textvariable=self.DimentionVar)
       self.PopulationF = Entry(self,textvariable=self.PopulationVar)
@@ -42,10 +46,14 @@ class Gui( Frame ):
       self.GamaF = Entry(self,textvariable=self.GamaVar)
       self.LoudnessF = Entry(self,textvariable=self.LoudnessVar)
       self.PulseRateF = Entry(self,textvariable=self.PulseRateVar)
+      self.IterationForWritingF = Entry(self, textvariable = self.IterationForWritingVar)
 
       self.start = Button(self,text=" Start  ",command=self.move)
+      self.stop = Button(self,text = " Stop ",command = self.stopMove)
 
-      self.start.grid(row = 9, column =1, sticky = W+E+N+S)
+      self.start.grid(row = 10, column = 0, sticky = W+E+N+S)
+      self.stop.grid(row = 10, column  = 1, sticky = W+E+N+S)
+
 
       self.DimentionF.grid(row = 0, column = 1,sticky = W+E+N+S )
       self. PopulationF.grid(row = 1, column = 1, sticky = W+E+N+S)
@@ -56,6 +64,7 @@ class Gui( Frame ):
       self.GamaF.grid(row = 6, column = 1, sticky = W+E+N+S)
       self.LoudnessF.grid(row = 7, column = 1, sticky = W+E+N+S)
       self.PulseRateF.grid(row = 8, column = 1, sticky = W+E+N+S)
+      self.IterationForWritingF.grid(row = 9, column = 1, sticky = W+E+N+S)
 
       self.DimentionLb.grid(row = 0, column = 0,sticky = W+E+N+S )
       self. PopulationLb.grid(row = 1, column = 0, sticky = W+E+N+S)
@@ -66,6 +75,8 @@ class Gui( Frame ):
       self.GamaLb.grid(row = 6, column = 0, sticky = W+E+N+S)
       self.LoudnessLb.grid(row = 7, column = 0, sticky = W+E+N+S)
       self.PulseRateLb.grid(row = 8, column = 0, sticky = W+E+N+S)
+      self.IterationForWritingLb.grid(row = 9, column = 0, sticky = W+E+N+S)
+
 
       self.DimentionVar.set(2)
       self.PopulationVar.set(40)
@@ -75,7 +86,8 @@ class Gui( Frame ):
       self.AlphaVar.set(0.9)
       self.GamaVar.set(0.9)
       self.LoudnessVar.set(0.5)
-      self.PulseRateVar.set(0.8)
+      self.PulseRateVar.set(0.5)
+      self.IterationForWritingVar.set(100)
 
       self.rowconfigure(0,weight =1)
       self.rowconfigure(1,weight =1)
@@ -87,18 +99,22 @@ class Gui( Frame ):
       self.rowconfigure(7,weight =1)
       self.rowconfigure(8,weight =1)
       self.rowconfigure(9,weight =1)
+      self.rowconfigure(10,weight =1)
 
       self.columnconfigure(0,weight = 1)
       self.columnconfigure(1,weight = 1)
     
    def move(self):
       if(self.ValidationFields()):
-         Algorithm = BatAlgorithm(self.DimentionVar.get(), self.PopulationVar.get(), self.IteretionVar.get(),float(self.MinFrequencyVar.get()), float(self.MaxFrequencyVar.get()),float(self.AlphaVar.get()),float(self.GamaVar.get()),float(self.LoudnessVar.get()),float(self.PulseRateVar.get()),self.Rosenbrock)
+         Algorithm = BatAlgorithm(self.DimentionVar.get(), self.PopulationVar.get(), self.IteretionVar.get(),float(self.MinFrequencyVar.get()), float(self.MaxFrequencyVar.get()),float(self.AlphaVar.get()),float(self.GamaVar.get()),float(self.LoudnessVar.get()),float(self.PulseRateVar.get()),self.IterationForWritingVar.get(),self.Rosenbrock)
          Algorithm.move_bat()
       else:
          messagebox.showinfo("Exception", "Введіть, будь ласка, всі поля")
-
-
+   
+   def stopMove(self):
+      print("stop")
+      
+       
    def Rosenbrock(self,Dim, sol):
    	npSol = np.array(sol)
    	return sum(100*(npSol[1:] - npSol[:-1]**2)**2 + (1 - npSol[:-1])**2)
@@ -121,6 +137,8 @@ class Gui( Frame ):
       elif (len(self.LoudnessVar.get()) == 0):
          return False
       elif (len(self.PulseRateVar.get()) == 0):
+         return False
+      elif (len(str(self.IterationForWritingVar.get())) == 0):
          return False
       else: return True
 

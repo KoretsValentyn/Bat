@@ -1,9 +1,10 @@
 import random 
 from math import exp
 import numpy as np
+import os
 
 class BatAlgorithm():
-    def __init__(self, Dim, NP, N_Gen, Qmin, Qmax, Alpha , Gama, Loudness, PulseRate, function):
+    def __init__(self, Dim, NP, N_Gen, Qmin, Qmax, Alpha , Gama, Loudness, PulseRate,k,function):
         self.Dim = Dim  #Розмірність
         self.NP = NP  #Розмір популяції
         self.N_Gen = N_Gen  #Ітерації
@@ -13,6 +14,7 @@ class BatAlgorithm():
         self.Gama = Gama
         self.Loudness = Loudness       #гучність звукового сигналу
         self.PulseRate = PulseRate     #Інтенсивність звукового сигналу
+        self.k = k # Номер ітерації для збереження результатів
         self.Lower = -5.12  #Нижня межа
         self.Upper = 5.12  #Верхня межа
 
@@ -35,6 +37,15 @@ class BatAlgorithm():
     def best_bat(self):
         i = 0
         j = 0
+
+        try:
+            os.mkdir("Information")
+        except:
+            pass 
+
+        TextFile = open(os.getcwd()+"\\Information\\"+"Population.txt", 'w')
+        TextFile.close()
+
         for i in range(self.NP):
             if self.Fitness[i] < self.Fitness[j]:   #Шукаємо мінімальне значення функції
                 j = i
@@ -104,13 +115,34 @@ class BatAlgorithm():
                         self.best[j] = S[i][j]
                     self.f_min = Flocal
             self.average_health_history.append(np.average(self.Fitness))
+
+            if t%self.k == 0:
+                self.WritingInfo(t)
+
             if self.stop(t):
-                print("break!")
                 print(t)
                 break
 
         print(self.f_min) 
         print(self.best)
+
+    def WritingInfo(self,t):
+        my_file = open(os.getcwd()+"\\Information\\"+"Population.txt", 'a')
+        my_file.write('\n')
+        iterationStr = "Ітерація: {0}".format(t)
+        my_file.write(iterationStr+'\n')
+        my_file.write("Здоров'я кожного кажана в популяції: "+'\n')
+        for h in range(self.NP):
+            my_file.write(str(self.Fitness[h].item())+'\n')
+        averageHealthPopulation = "Середнє здоров'я популяції: {0}".format(str(self.average_health_history[t].item()))
+        my_file.write(averageHealthPopulation + '\n')
+        bestBat = "Кращий кажан: {0}".format(self.best)
+        minFunction = "Краще значення Фітнес-функції: {0}".format(self.f_min)
+        my_file.write(bestBat + '\n')
+        my_file.write(minFunction+'\n')
+
+        my_file.close()
+
 
     def stop(self, t):
         if t>=4:
