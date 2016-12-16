@@ -2,6 +2,9 @@ import random
 from math import exp
 import numpy as np
 import os
+import gui
+
+
 
 class BatAlgorithm():
     def __init__(self, Dim, NP, N_Gen, Qmin, Qmax, Alpha , Gama, Loudness, PulseRate,k,function):
@@ -18,6 +21,10 @@ class BatAlgorithm():
         self.Lower = -5.12  #Нижня межа
         self.Upper = 5.12  #Верхня межа
 
+        self.iteration = 0
+
+        self.count = 1
+
         self.f_min = 0.0  
 
         self.Lb = [0] * self.Dim  
@@ -31,8 +38,8 @@ class BatAlgorithm():
         self.Fitness = [0] * self.NP  # Здоровя
         self.average_health_history = []   #Середнє здоров'я популяцій
         self.best = [0] * self.Dim  #Кращі кажанів (координати)
+        self.average_best = []
         self.Fun = function
-        
 
     def best_bat(self):
         i = 0
@@ -54,6 +61,7 @@ class BatAlgorithm():
         self.f_min = self.Fitness[j]
 
     def init_bat(self):
+  
         for i in range(self.Dim):
             self.Lb[i] = self.Lower
             self.Ub[i] = self.Upper
@@ -68,6 +76,7 @@ class BatAlgorithm():
                 self.v[i][j] = 0.0
                 self.Sol[i][j] = self.Lb[j] + (self.Ub[j] - self.Lb[j]) * rnd #Випадковим чином генеруємо координати початкох кажанів
             self.Fitness[i] = self.Fun(self.Dim, self.Sol[i])
+            self.count = self.count + 1
         self.best_bat()
 
     def simplebounds(self, val, lower, upper):
@@ -82,10 +91,12 @@ class BatAlgorithm():
 
         self.init_bat()
 
-        for t in range(self.N_Gen):
+
+
+        for self.iteration in range(self.N_Gen):
             for i in range(self.NP):
                 rnd = random.uniform(0, 1)
-                self.Q[i] = self.Qmin + (self.Qmin - self.Qmax) * rnd        
+                self.Q[i] = self.Qmin + (self.Qmax - self.Qmin) * rnd        
                 for j in range(self.Dim):
                     self.v[i][j] = self.v[i][j] + (self.Sol[i][j] -
                                                    self.best[j]) * self.Q[i]  #Нова швидкість кажана	
@@ -100,6 +111,7 @@ class BatAlgorithm():
                     for j in range(self.Dim):
                         S[i][j] = self.best[j] + np.average(self.A) * random.uniform(-1, 1)    #Локальний пошук методом випадкового блукання  
                 Flocal = self.Fun(self.Dim, S[i])
+                self.count = self.count + 1
 
                 rnd = random.random()
 
@@ -108,23 +120,36 @@ class BatAlgorithm():
                     	self.Sol[i][j] = S[i][j]
                     self.Fitness[i] = Flocal        
                     self.A[i] = self.A[i]*self.Alpha
-                    self.r[i] = self.PulseRate*(1-exp(-self.Gama*(t)))
+                    self.r[i] = self.PulseRate*(1-exp(-self.Gama*(self.iteration)))
 
                 if Flocal <= self.f_min:
                     for j in range(self.Dim):
                         self.best[j] = S[i][j]
                     self.f_min = Flocal
-            self.average_health_history.append(np.average(self.Fitness))
 
-            if t%self.k == 0:
-                self.WritingInfo(t)
+            self.average_health_history.append(np.average(self.Fitness))   # середнє здоров'я особин популяцій 
+            self.average_best.append(self.f_min)    # - відхилення середнього знайденого розв’язку від оптимального 
 
-            if self.stop(t):
-                print(t)
+            #if self.iteration%self.k == 0:
+                #self.WritingInfo(self.iteration)
+
+            if self.stop(self.iteration):
                 break
+        dist = np.linalg.norm(self.best - np.array([1]*self.Dim))
+        strings= (str(self.iteration) + '\t' + str(self.count) + '\t'+str(self.f_min) + '\t'+str(np.average(self.average_best)) + '\t'+str(dist) + '\t')
+        test = open("test.txt",'a')
+        test.write(strings)
+        test.close
 
-        print(self.f_min) 
-        print(self.best)
+           
+        #print(self.f_min) 
+        #
+        #print(self.iteration)
+        #print(self.best)
+        #print(self.count)
+        #print(np.average(self.average_best))
+            
+        
 
     def WritingInfo(self,t):
         my_file = open(os.getcwd()+"\\Information\\"+"Population.txt", 'a')
@@ -140,6 +165,8 @@ class BatAlgorithm():
         minFunction = "Краще значення Фітнес-функції: {0}".format(self.f_min)
         my_file.write(bestBat + '\n')
         my_file.write(minFunction+'\n')
+        dist = np.linalg.norm(self.best - np.array([1]*self.Dim))
+        my_file.write(dist+'\n')
 
         my_file.close()
 
@@ -153,3 +180,13 @@ class BatAlgorithm():
                 return False
         else:
             return False
+
+         
+
+                
+
+
+
+
+
+        

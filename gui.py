@@ -3,6 +3,9 @@ from BatAlgorithm import *
 import numpy as np
 from tkinter import*
 from tkinter import messagebox
+import threading
+
+
 
 class Gui( Frame ):
    def __init__( self ):
@@ -11,6 +14,8 @@ class Gui( Frame ):
 
       self.master.rowconfigure( 0, weight = 1 )
       self.master.columnconfigure( 0, weight = 1 )
+      self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+
       self.grid( sticky = W+E+N+S )
 
       self.DimentionLb = Label(self, text="Dimention: ")
@@ -48,7 +53,7 @@ class Gui( Frame ):
       self.PulseRateF = Entry(self,textvariable=self.PulseRateVar)
       self.IterationForWritingF = Entry(self, textvariable = self.IterationForWritingVar)
 
-      self.start = Button(self,text=" Start  ",command=self.move)
+      self.start = Button(self,text=" Start  ",command = lambda: threading.Thread(target = self.move).start())
       self.stop = Button(self,text = " Stop ",command = self.stopMove)
 
       self.start.grid(row = 10, column = 0, sticky = W+E+N+S)
@@ -103,21 +108,31 @@ class Gui( Frame ):
 
       self.columnconfigure(0,weight = 1)
       self.columnconfigure(1,weight = 1)
-    
+
+   def on_closing(self):
+      self.master.destroy()
+
+
+
+     
    def move(self):
       if(self.ValidationFields()):
-         Algorithm = BatAlgorithm(self.DimentionVar.get(), self.PopulationVar.get(), self.IteretionVar.get(),float(self.MinFrequencyVar.get()), float(self.MaxFrequencyVar.get()),float(self.AlphaVar.get()),float(self.GamaVar.get()),float(self.LoudnessVar.get()),float(self.PulseRateVar.get()),self.IterationForWritingVar.get(),self.Rosenbrock)
-         Algorithm.move_bat()
+         for i in range(10):
+            Algorithm = BatAlgorithm(self.DimentionVar.get(), self.PopulationVar.get(), self.IteretionVar.get(),float(self.MinFrequencyVar.get()), float(self.MaxFrequencyVar.get()),float(self.AlphaVar.get()),float(self.GamaVar.get()),float(self.LoudnessVar.get()),float(self.PulseRateVar.get()),self.IterationForWritingVar.get(),self.Rosenbrock)
+            Algorithm.move_bat()
       else:
          messagebox.showinfo("Exception", "Введіть, будь ласка, всі поля")
-   
+      print("finish")
+
    def stopMove(self):
-      print("stop")
-      
+      global flag
+      flag = 1
+      print("flag in stopMove")
+      print(flag)
        
    def Rosenbrock(self,Dim, sol):
-   	npSol = np.array(sol)
-   	return sum(100*(npSol[1:] - npSol[:-1]**2)**2 + (1 - npSol[:-1])**2)
+      npSol = np.array(sol)
+      return sum(100*(npSol[1:] - npSol[:-1]**2)**2 + (1 - npSol[:-1])**2)
 
    def ValidationFields(self):
       if(len(str(self.DimentionVar.get())) == 0):
@@ -144,7 +159,8 @@ class Gui( Frame ):
 
 
 def main():
-   Gui().mainloop()   
+   Gui().mainloop()
+     
 
 if __name__ == "__main__":
    main()
