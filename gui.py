@@ -1,10 +1,9 @@
 import random
-from BatAlgorithm import *
 import numpy as np
+import BatAlgorithm
 from tkinter import*
 from tkinter import messagebox
 import threading
-
 
 
 class Gui( Frame ):
@@ -112,23 +111,18 @@ class Gui( Frame ):
    def on_closing(self):
       self.master.destroy()
 
-
-
      
    def move(self):
       if(self.ValidationFields()):
-         for i in range(10):
-            Algorithm = BatAlgorithm(self.DimentionVar.get(), self.PopulationVar.get(), self.IteretionVar.get(),float(self.MinFrequencyVar.get()), float(self.MaxFrequencyVar.get()),float(self.AlphaVar.get()),float(self.GamaVar.get()),float(self.LoudnessVar.get()),float(self.PulseRateVar.get()),self.IterationForWritingVar.get(),self.Rosenbrock)
-            Algorithm.move_bat()
+         BatAlgorithm.flag = False
+         Algorithm = BatAlgorithm.BatAlgorithm(self.DimentionVar.get(), self.PopulationVar.get(), self.IteretionVar.get(),float(self.MinFrequencyVar.get()), float(self.MaxFrequencyVar.get()),float(self.AlphaVar.get()),float(self.GamaVar.get()),float(self.LoudnessVar.get()),float(self.PulseRateVar.get()),self.IterationForWritingVar.get(),self.Rosenbrock)
+         Algorithm.move_bat()
       else:
          messagebox.showinfo("Exception", "Введіть, будь ласка, всі поля")
       print("finish")
 
    def stopMove(self):
-      global flag
-      flag = 1
-      print("flag in stopMove")
-      print(flag)
+      BatAlgorithm.flag = True
        
    def Rosenbrock(self,Dim, sol):
       npSol = np.array(sol)

@@ -4,7 +4,7 @@ import numpy as np
 import os
 import gui
 
-
+flag = False
 
 class BatAlgorithm():
     def __init__(self, Dim, NP, N_Gen, Qmin, Qmax, Alpha , Gama, Loudness, PulseRate,k,function):
@@ -41,18 +41,10 @@ class BatAlgorithm():
         self.average_best = []
         self.Fun = function
 
+
     def best_bat(self):
         i = 0
         j = 0
-
-        try:
-            os.mkdir("Information")
-        except:
-            pass 
-
-        TextFile = open(os.getcwd()+"\\Information\\"+"Population.txt", 'w')
-        TextFile.close()
-
         for i in range(self.NP):
             if self.Fitness[i] < self.Fitness[j]:   #Шукаємо мінімальне значення функції
                 j = i
@@ -61,7 +53,12 @@ class BatAlgorithm():
         self.f_min = self.Fitness[j]
 
     def init_bat(self):
-  
+        try:
+            os.mkdir("Information")
+        except:
+               pass
+        TextFile = open(os.getcwd()+"\\Information\\"+"Population.txt", 'w')
+        TextFile.close()
         for i in range(self.Dim):
             self.Lb[i] = self.Lower
             self.Ub[i] = self.Upper
@@ -90,8 +87,6 @@ class BatAlgorithm():
         S = [[0.0 for i in range(self.Dim)] for j in range(self.NP)]   #Положення кажанів
 
         self.init_bat()
-
-
 
         for self.iteration in range(self.N_Gen):
             for i in range(self.NP):
@@ -127,29 +122,25 @@ class BatAlgorithm():
                         self.best[j] = S[i][j]
                     self.f_min = Flocal
 
+                if(flag):
+                	break
+            if(flag):
+            	break
+
             self.average_health_history.append(np.average(self.Fitness))   # середнє здоров'я особин популяцій 
             self.average_best.append(self.f_min)    # - відхилення середнього знайденого розв’язку від оптимального 
 
-            #if self.iteration%self.k == 0:
-                #self.WritingInfo(self.iteration)
+            if self.iteration%self.k == 0:
+                self.WritingInfo(self.iteration)
 
             if self.stop(self.iteration):
                 break
-        dist = np.linalg.norm(self.best - np.array([1]*self.Dim))
-        strings= (str(self.iteration) + '\t' + str(self.count) + '\t'+str(self.f_min) + '\t'+str(np.average(self.average_best)) + '\t'+str(dist) + '\t')
-        test = open("test.txt",'a')
-        test.write(strings)
-        test.close
+
 
            
-        #print(self.f_min) 
-        #
-        #print(self.iteration)
-        #print(self.best)
-        #print(self.count)
-        #print(np.average(self.average_best))
-            
-        
+        print(self.f_min) 
+        print(self.iteration)
+        print(self.best)        
 
     def WritingInfo(self,t):
         my_file = open(os.getcwd()+"\\Information\\"+"Population.txt", 'a')
@@ -165,10 +156,17 @@ class BatAlgorithm():
         minFunction = "Краще значення Фітнес-функції: {0}".format(self.f_min)
         my_file.write(bestBat + '\n')
         my_file.write(minFunction+'\n')
-        dist = np.linalg.norm(self.best - np.array([1]*self.Dim))
+        dist = "Евклідова відстань: {0}".format(str(np.linalg.norm(self.best - np.array([1]*self.Dim))))
         my_file.write(dist+'\n')
 
         my_file.close()
+
+    def WriteInToExcell():
+        dist = np.linalg.norm(self.best - np.array([1]*self.Dim))
+        strings= (str(self.iteration) + '\t' + str(self.count) + '\t'+str(self.f_min) + '\t'+str(np.average(self.average_best)) + '\t'+str(dist) + '\t')
+        test = open("test.txt",'a')
+        test.write(strings)
+        test.close
 
 
     def stop(self, t):
