@@ -111,7 +111,6 @@ class Gui( Frame ):
    def on_closing(self):
       self.master.destroy()
 
-     
    def move(self):
       if(self.ValidationFields()):
          BatAlgorithm.flag = False

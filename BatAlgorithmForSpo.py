@@ -2,22 +2,23 @@ import random
 from math import exp
 import numpy as np
 import os
-import gui
+import spo
 
 flag = False
 
-class BatAlgorithm():
-    def __init__(self, Dim, NP, N_Gen, Qmin, Qmax, Alpha , Gama, Loudness, PulseRate,k,function):
-        self.Dim = Dim  #Розмірність
-        self.NP = NP  #Розмір популяції
-        self.N_Gen = N_Gen  #Ітерації
-        self.Qmin = Qmin  #Мінімальна частота
-        self.Qmax = Qmax  #Максимальна частота
-        self.Alpha = Alpha  
-        self.Gama = Gama
-        self.Loudness = Loudness       #гучність звукового сигналу
-        self.PulseRate = PulseRate     #Інтенсивність звукового сигналу
-        self.k = k # Номер ітерації для збереження результатів
+class BatAlgorithmForSpo():
+    def __init__(self,criterionsValueInt,x):
+        self.Dim = 2
+        self.NP = criterionsValueInt[1]
+        self.N_Gen = criterionsValueInt[0]
+        self.Qmin = criterionsValueInt[2]
+        self.Qmax = criterionsValueInt[3]
+        self.Alpha = criterionsValueInt[4]
+        self.Gama = criterionsValueInt[5]
+
+        self.Loudness = x[0]
+        self.PulseRate = x[1]
+
         self.Lower = - 5.12  #Нижня межа
         self.Upper = 5.12  #Верхня межа
 
@@ -39,7 +40,10 @@ class BatAlgorithm():
         self.average_health_history = []   #Середнє здоров'я популяцій
         self.best = [0] * self.Dim  #Кращі кажанів (координати)
         self.average_best = []
-        self.Fun = function
+
+    def Fun(self,Dim, sol):
+      npSol = np.array(sol)
+      return sum(100*(npSol[1:] - npSol[:-1]**2)**2 + (1 - npSol[:-1])**2)
 
 
     def best_bat(self):
@@ -130,9 +134,6 @@ class BatAlgorithm():
             self.average_health_history.append(np.average(self.Fitness))   # середнє здоров'я особин популяцій 
             self.average_best.append(self.f_min)    # - відхилення середнього знайденого розв’язку від оптимального 
 
-            if self.iteration%self.k == 0:
-                self.WritingInfo(self.iteration)
-
             if self.stop(self.iteration):
                 break
       
@@ -166,7 +167,7 @@ class BatAlgorithm():
         test.write(strings)
         test.close
 
-    def getDeviationBestSolution():
+    def getDeviationBestSolution(self):
     	return self.f_min
 
 
